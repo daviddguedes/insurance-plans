@@ -6,7 +6,7 @@ const Main = () => {
 
   return (
     <div>
-      <MainChart width={width} height={height} />
+      <MainChart width={width * 0.8} height={height} />
     </div>
   )
 }

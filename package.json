@@ -17,6 +17,7 @@
     "@visx/scale": "^1.7.0",
     "@visx/shape": "^1.8.0",
     "@visx/threshold": "^1.8.0",
+    "@visx/tooltip": "^1.7.2",
     "next": "10.2.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
