@@ -23,7 +23,7 @@ const TootltipComponent = ({ TooltipInPortal, tooltipTop, tooltipLeft, tooltipDa
       left={tooltipLeft}
       applyPositionStyle
     >
-      <div style={{ padding: '1em' }}>
+      <div style={{ padding: '1em', borderLeft: '1px solid blue' }}>
         <p>{tooltipData.label}</p>
         <p>{tooltipData.provider}</p>
         <p>{calculateCoverages(tooltipData).startCoverage} to {calculateCoverages(tooltipData).endCoverage}</p>

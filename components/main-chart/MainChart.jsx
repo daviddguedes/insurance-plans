@@ -31,6 +31,12 @@ const verticalScale = scaleBand({
 
 const defaultMargin = { top: 40, right: 30, bottom: 50, left: 150 };
 
+const TickComponent = () => {
+  return (
+    <div>TICK</div>
+  )
+}
+
 export default function MainChart({ width, height, margin = defaultMargin }) {
   if (!width || width < 10) return null;
   const {
@@ -62,6 +68,11 @@ export default function MainChart({ width, height, margin = defaultMargin }) {
   providerScale.range([0, xMax]);
   verticalScale.range([yMax, 0]);
 
+  const getVerticalLabel = useCallback((verticalKey) => {
+    const line = data.find(d => d.key === verticalKey);
+    return line.label;
+  }, []);
+
   return (
     <div>
       <svg ref={containerRef} width={width} height={height}>
@@ -72,7 +83,7 @@ export default function MainChart({ width, height, margin = defaultMargin }) {
           <line x1={xMax} x2={xMax} y1={0} y2={yMax} stroke="#e0e0e0" />
           <line x1={0} x2={xMax} y1={0} y2={0} stroke="#e0e0e0" />
           <AxisBottom top={yMax} scale={providerScale} numTicks={width > 520 ? 10 : 5} />
-          <AxisLeft scale={verticalScale} />
+          <AxisLeft scale={verticalScale} tickFormat={(d) => getVerticalLabel(d)} />
           {data.map((v, i) => (
             <Circle
               key={i}
