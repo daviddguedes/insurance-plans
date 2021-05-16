@@ -3,13 +3,14 @@ import { scaleBand } from '@visx/scale';
 import { AxisLeft, AxisBottom } from '@visx/axis';
 import { GridRows, GridColumns } from '@visx/grid';
 import { Circle } from '@visx/shape';
-import { useTooltip, useTooltipInPortal, TooltipWithBounds } from '@visx/tooltip';
+import { useTooltip, useTooltipInPortal } from '@visx/tooltip';
 import { localPoint } from '@visx/event';
 
 import { data } from './data-mock';
-import { Button } from 'semantic-ui-react';
+import { useCallback } from 'react';
+import TootltipComponent from '../tooltip/TooltipComponent';
 
-const background = '#fafafa';
+const background = '#fcfcfc';
 
 const verticals = new Set(data.map(v => v.key));
 const providerAcc = (d) => d['provider'];
@@ -30,17 +31,6 @@ const verticalScale = scaleBand({
 
 const defaultMargin = { top: 40, right: 30, bottom: 50, left: 150 };
 
-const calculateCoverages = data => {
-  const months = +data.coverage.split(' ')[0]
-  const startDate = new Date().getDate() + 1;
-  const startMonth = new Date().getMonth();
-  const startYear = new Date().getFullYear();
-  const startCoverage = new Date(startYear, startMonth, startDate);
-  const endCoverage = new Date(startYear, startMonth, startDate);
-  endCoverage.setMonth(endCoverage.getMonth() + months);
-  return { startCoverage: startCoverage.toLocaleDateString(), endCoverage: endCoverage.toLocaleDateString() };
-}
-
 export default function MainChart({ width, height, margin = defaultMargin }) {
   if (!width || width < 10) return null;
   const {
@@ -49,6 +39,7 @@ export default function MainChart({ width, height, margin = defaultMargin }) {
     tooltipTop,
     tooltipOpen,
     showTooltip,
+    hideTooltip
   } = useTooltip();
 
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
@@ -56,15 +47,14 @@ export default function MainChart({ width, height, margin = defaultMargin }) {
     scroll: true,
   })
 
-  const handleMouseOver = (event, d) => {
+  const handleMouseOver = useCallback((event, d) => {
     const coords = localPoint(event.target.ownerSVGElement, event);
-    console.log(coords);
     showTooltip({
       tooltipLeft: coords.x,
       tooltipTop: coords.y,
       tooltipData: d
     });
-  };
+  }, [tooltipOpen]);
 
   const xMax = width - margin.left - margin.right;
   const yMax = height - margin.top - margin.bottom;
@@ -88,28 +78,17 @@ export default function MainChart({ width, height, margin = defaultMargin }) {
               key={i}
               cx={providerScale(providerAcc(v))}
               cy={verticalScale(verticalAcc(v))}
-              r={width / 100}
+              r={width / 60}
               fill={v.color}
               onMouseOver={(e) => handleMouseOver(e, v)}
             />
           ))}
 
-          {tooltipOpen && (
-            <TooltipInPortal
-              key={Math.random()}
-              top={tooltipTop}
-              left={tooltipLeft}
-            >
-              <div style={{ padding: '1em' }}>
-                <p>{tooltipData.label}</p>
-                <p>{tooltipData.provider}</p>
-                <p>{tooltipData.coverage}</p>
-                <p>{calculateCoverages(tooltipData).startCoverage} to {calculateCoverages(tooltipData).endCoverage}</p>
-                <p>{tooltipData.price}</p>
-                <Button label="Get a Quote" />
-              </div>
-            </TooltipInPortal>
-          )}
+          {tooltipOpen && <TootltipComponent
+            TooltipInPortal={TooltipInPortal}
+            tooltipData={tooltipData}
+            tooltipLeft={tooltipLeft}
+            tooltipTop={tooltipTop} />}
         </Group>
       </svg>
     </div>
